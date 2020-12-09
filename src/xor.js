@@ -1,7 +1,9 @@
 import * as tf from '@tensorflow/tfjs-node';
+import { fileSystem } from '@tensorflow/tfjs-node/dist/io';
 import dotenv from 'dotenv';
 dotenv.config();
 const IS_DEBUG = process.env.IS_DEBUG === 'true';
+const FILENAME = process.env.FILENAME;
 
 const NUM_LAYERS = 1;
 const NUM_UNITS = 15;
@@ -42,8 +44,9 @@ const onEpochEnd = (epoch, info) => {
 
 const trainXor = (model) => {
   return model.fit(inputs, outputs, {
-    epochs: 500,
+    epochs: 150,
     batchSize: 1,
+    verbose: IS_DEBUG ? 1 : 0,
     validationData: [inputs, outputs],
     callbacks: {
       onEpochEnd,
@@ -70,7 +73,9 @@ const xor = (attempt = 0) => {
     }
     if (finalAccurancy > 0.99) {
       console.log('Model successfully generated');
-      model.save('file:///C:/xor')
+      if (FILENAME) {
+        model.save(FILENAME);
+      }
     } else {
       console.log('Model not generated successfully!!');
       if (attempt < 5) {
