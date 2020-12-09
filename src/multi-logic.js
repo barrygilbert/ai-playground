@@ -1,17 +1,14 @@
-import * as tf from '@tensorflow/tfjs-node';
-import dotenv from 'dotenv';
-dotenv.config();
-const IS_DEBUG = process.env.IS_DEBUG === 'true';
+import * as tf from '@tensorflow/tfjs';
 
-const NUM_LAYERS = 1;
-const NUM_UNITS = 15;
+const NUM_LAYERS = 3;
+const NUM_UNITS = 25;
 
 const inputs = tf.tensor([
   [ 0, 0 ], [ 0, 1 ], [ 1, 0 ], [ 1, 1 ],
 ]);
 
 const outputs = tf.tensor([
-  [ 0 ], [ 1 ], [ 1 ], [ 0 ],
+  [ 0, 0, 0 ], [ 0, 1, 1 ], [ 0, 1, 1 ], [ 1, 1, 0 ],
 ]);
 
 const createXorModel = () => {
@@ -23,7 +20,7 @@ const createXorModel = () => {
     }
     model.add(tf.layers.dense(opts));
   }
-  model.add(tf.layers.dense({ units: 1, activation: 'relu' }));
+  model.add(tf.layers.dense({ units: 3, activation: 'relu' }));
 
   model.compile({
     optimizer: 'sgd',
@@ -35,7 +32,7 @@ const createXorModel = () => {
 };
 
 const onEpochEnd = (epoch, info) => {
-  if (epoch % 50 === 0 && IS_DEBUG) {
+  if (epoch % 50 === 0) {
     console.log(`Epoch ${epoch} complete. Accurracy: ${info.acc}`);
   }
 }
@@ -51,33 +48,26 @@ const trainXor = (model) => {
   });
 };
 
-const testXor = (model) => {
+const testIt = (model) => {
   const inputs = [[0,0],[0,1],[1,0],[1,1]];
-  console.log('XOR Results:');
+  console.log('Logic Results (input => [and, or, xor]):');
   inputs.map(input => {
     const result = model.predict(tf.tensor([input]));
-    console.log(` ${JSON.stringify(input)} => ${result.arraySync()[0]}`);
+    console.log(` ${JSON.stringify(input)} => ${JSON.stringify(result.arraySync()[0])}`);
   })
 }
 
-const xor = (attempt = 0) => {
+const xor = () => {
   const model = createXorModel();
   trainXor(model).then(info => {
-    const finalAccurancy = info.history.acc[info.history.acc.length-1];
-    if (IS_DEBUG) {
-      console.log(`Final accuracy: ${finalAccurancy}`);
-      testXor(model);
-    }
+    const finalAccurancy = info.history.acc[info.history.acc.length-1]
+    console.log(`Final accuracy: ${finalAccurancy}`);
     if (finalAccurancy > 0.99) {
       console.log('Model successfully generated');
-      model.save('file:///C:/xor')
     } else {
       console.log('Model not generated successfully!!');
-      if (attempt < 5) {
-        console.log('Attempting to generate xor again...');
-        return xor(attempt + 1);
-      }
     }
+    testIt(model);
   });
 };
 
