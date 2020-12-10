@@ -1,5 +1,7 @@
-import multiLogic from './multi-logic';
-import xor from './xor';
+import xor from './logic-gates/xor';
+import and from './logic-gates/and';
+import or from './logic-gates/or';
 
-// multiLogic();
 xor();
+and();
+or();

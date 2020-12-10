@@ -1,2 +1,4 @@
 node_modules
+.envbuilt/
 .env
+built/

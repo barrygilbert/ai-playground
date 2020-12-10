@@ -14,8 +14,10 @@
     "nodemon": "^2.0.6"
   },
   "dependencies": {
-    "@tensorflow/tfjs": "^2.7.0",
     "@tensorflow/tfjs-node": "^2.7.0",
     "dotenv": "^8.2.0"
+  },
+  "nodemonConfig": {
+    "ignore": ["built/*"]
   }
 }
